@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 以太坊 go-ethereum 目录结构
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿# 以太坊 go-ethereum 目录结构
 | 目录 | 介绍|
 |:--|:--|
 | accounts | 实现的是以太坊账户管理 |
@@ -252,47 +252,50 @@ func NewBlockChain(chainDb ethdb.Database, config *params.ChainConfig, engine co
 ethash解析
 
 # 数据持久化
+
+1. 目录结构
+
  	1. database.go:封装了对 levelDB 的操作代码
  	2. interface.go:数据库接口
  	3. memory_database.go:提供一个测试使用的内存数据库
  	4. database_test.go:测试案例
- 2. levelDB
- 	1. google 开发开源 k-v 存储源码数据库
- 	2. 源码:https://github.com/syndtr/goleveldb
- 	3. 特点：
- 		1. leveldb 是一个持久化存储的 k-v 系统，与 redis 相比， leveldb 是将大部分数据存储在磁盘中。而 redis 是一个内存型的 k-v 存储系统，会吃内存。
- 		2. leveldb 在存储数据时，是有序存储的，也就是相邻的 key 值在存储文件中按照顺序存储。
- 		3. 与其它 k-v 系统一样，levelDB 操作接口简单，基本操作也只包括增、删、改、查。也支持批量操作。
- 		4. leverDB 支持数据快照(snapshot)功能，可以使得读取操作不受到写操作的影响。
- 		5. levelDB 支持数据压缩，可以很好的减少存储空间，提高 IO 效率。
- 	4. 限制
- 		1. 非关系型数据库，不支持 sql 查询，不支持索引。
- 		2. 一次只允许一个进程访问一个特定的数据库。
- 3. 源码详解
- 	1. interface.go
- 		1. 对 leveldb 的数据库操作的封装
- 		2. 单独处理时并发安全
- 		3. 批处理时不能并发操作
- 	2. database.go
- 		1. 新建 ldb 对象
- 		2. 对 interface 中接口函数的实现
- 			1. 单条数据操作
- 			2. 批量数据操作
- 		4. 对 eth 服务的监听以及数据统计
- 		5. 引用
- 			1. 初始化创世区块
- 			2. 从指定的区块链数据库中创建本地区块链
- 		6. Metircs
- 			1. 概念：系统性能度量框架，如果我们需要为某个系统或者服务做监控、统计等，就可以用到它。通常有 5 种类型。
- 			2. Meters：监控一系列事件发生的速率，在以太坊最大的作用就是监控 TPS。Meters 会统计最近 1min，5min，15min以及全部时间的速率。
- 			3. gauges：最简单的度量指标，统计瞬时状态，只有一个简单的返回值。
- 			4. Histograms：统计数据的分布情况。比如最小值，最大值和中间值，中位数。
- 			5. Times：和 meters 类似，它是 meters 和 histograms 结合，histograms  统计耗时，meter 统计 TPS。 
- 			6. counter：计数器。
- 	3. memory_database.go: 内存数据库，主要用于测试。
- 		1. 关于内存数据库的相关结构定义
- 		2. 单条数据操作
- 		3. 批处理
+  2. levelDB
+     1. google 开发开源 k-v 存储源码数据库
+     2. 源码: https://github.com/syndtr/goleveldb
+     3. 特点
+        1. leveldb 是一个持久化存储的 k-v 系统，与 redis 相比， leveldb 是将大部分数据存储在磁盘中。而 redis 是一个内存型的 k-v 存储系统，会吃内存。
+        2. leveldb 在存储数据时，是有序存储的，也就是相邻的 key 值在存储文件中按照顺序存储。
+        3. 与其它 k-v 系统一样，levelDB 操作接口简单，基本操作也只包括增、删、改、查。也支持批量操作。
+        4. leverDB 支持数据快照(snapshot)功能，可以使得读取操作不受到写操作的影响。
+        5. levelDB 支持数据压缩，可以很好的减少存储空间，提高 IO 效率。
+       4. 限制
+            1. 非关系型数据库，不支持 sql 查询，不支持索引。
+            2. 一次只允许一个进程访问一个特定的数据库。
+  3. 源码详解
+        1. interface.go
+               1. 对 leveldb 的数据库操作的封装
+               2. 单独处理时并发安全
+               3. 批处理时不能并发操作
+        2. database.go
+               1. 新建 ldb 对象
+               2. 对 interface 中接口函数的实现
+                      1. 单条数据操作
+                      2. 批量数据操作
+               3. 对 eth 服务的监听以及数据统计
+               4. 引用
+                   			1. 初始化创世区块
+                   			2. 从指定的区块链数据库中创建本地区块链
+               5. Metircs
+                      			1. 概念：系统性能度量框架，如果我们需要为某个系统或者服务做监控、统计等，就可以用到它。通常有 5 种类型。
+                      			2. Meters：监控一系列事件发生的速率，在以太坊最大的作用就是监控 TPS。Meters 会统计最近 1min，5min，15min以及全部时间的速率。
+                      			3. gauges：最简单的度量指标，统计瞬时状态，只有一个简单的返回值。
+                      			4. Histograms：统计数据的分布情况。比如最小值，最大值和中间值，中位数。
+                      			5. Times：和 meters 类似，它是 meters 和 histograms 结合，histograms  统计耗时，meter 统计 TPS。 
+                      			6. counter：计数器。
+        3. memory_database.go: 内存数据库，主要用于测试。
+               1. 关于内存数据库的相关结构定义
+                      1. 单条数据操作
+               2. 批处理
 
 # 以太坊 geth 命令操作
 1. 概念：geth 是 go-ethereum 中最主要的一个命令行工具，也是各种网络的接入点，支持全节点和轻节点模式，其它程序也可以通过暴露的 JSON RPC 接口调用访问以太坊网络。
